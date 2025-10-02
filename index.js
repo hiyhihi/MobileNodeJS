@@ -2,7 +2,10 @@ import express from 'express';
 import mongoose from 'mongoose';
 import BaiDang from './models/baidang.model.js';
 import NguoiDung from './models/nguoidung.model.js';
+import dotenv from 'dotenv'
 const app = express()
+dotenv.config()
+
 
 app.use(express.json());
 
@@ -111,7 +114,8 @@ app.post("/api/login", async (req, res) => {
     }
 });
 
-mongoose.connect("mongodb+srv://huyphan1610_db_user:1@cluster0.fny6mrh.mongodb.net/test?retryWrites=true&w=majority&appName=Cluster0")
+console.log("URI:", process.env.MONGODB_URI || process.env.MONGO_URI);
+mongoose.connect(process.env.MONGODB_URI)
 .then(() => {
     console.log("Connected to database!")
     app.listen(3000, () => {

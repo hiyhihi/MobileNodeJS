@@ -1,18 +1,21 @@
 import mongoose from "mongoose";
 
-const baidangSchema = mongoose.Schema(
-    {
+const baidangSchema = mongoose.Schema({
     tenMon: {
         type: String,
         required: [true, "Hãy điền tên món ăn"]
     },
-    nguyenLieu: {
-        type: [String],
-        required: [true, "Hãy nhập nguyên liệu"]
-    },
+    nguyenLieu: [
+    {
+        ten: {
+            type: String,
+            required: [true, "Hãy nhập tên nguyên liệu"]
+        }
+    }
+    ],
     nguyenLieuDinhLuong: {
         type: String,
-        required: false
+        required: [true, "Hãy nhập định lượng nguyên liệu"]
     },
     cachLam: {
         type: String,
@@ -30,8 +33,7 @@ const baidangSchema = mongoose.Schema(
         type: String,
         required: false
     }
-    }
-);
+});
 
 const BaiDang = mongoose.model("BaiDang", baidangSchema);
 

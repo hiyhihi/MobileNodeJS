@@ -25,7 +25,14 @@ const nguoidungSchema = mongoose.Schema(
         password: {
             type: String,
             require: [true, "Hãy điền password"]
-        }        
+        },
+        fav: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "BaiDang",
+                required: false
+            }
+        ]  
     }
 );
 

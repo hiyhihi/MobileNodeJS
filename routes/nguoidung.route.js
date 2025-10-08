@@ -7,7 +7,7 @@ router.get("/", getAllNguoiDungs);
 router.get('/:id', getNguoiDungById);
 router.post('/register', createNguoiDung);
 router.post('/login', checklogin);
-router.put('/:id', updateNguoiDung);
+router.put('/update/:id', updateNguoiDung);
 router.patch('/patch', patchNguoiDung);     
 router.patch('/patch/addFav', addFavorite);
 router.patch('/patch/deleteFav', deleteFavorite);

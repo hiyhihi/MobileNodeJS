@@ -23,12 +23,12 @@ export const getBaiDangById = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const baidang = await BaiDang.findByIdAndUpdate(id);
+        const baidang = await BaiDang.findById(id);
 
         if (!baidang){
             return res.status(404).json({message: "Khong tim thay bai dang"});
         }
-        res.status(200).json({message: "Xoa bai dang thanh cong"});
+        res.status(200).json(baidang);
     } catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -84,7 +84,7 @@ export const searchBaiDangbyIngre = async (req, res) => {
         const baidang = await BaiDang.find({
             "nguyenLieu.ten": { $in: tenNguyenLieuArr} 
         })
-        console.log(baidang);
+        // console.log(baidang);
         res.status(200).json(baidang);
     } catch (error) {
         res.status(500).json({message: error.message});

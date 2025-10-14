@@ -86,11 +86,51 @@ export const deleteBaiDang = async (req, res) => {
 export const searchBaiDangbyIngre = async (req, res) => {
     try {
         const { nguyenLieu } = req.body;
-        const tenNguyenLieuArr = nguyenLieu.map(item => item.ten);
-        const baidang = await BaiDang.find({
-            "nguyenLieu.ten": { $in: tenNguyenLieuArr} 
-        })
-        res.status(200).json(baidang);
+        const tenNguyenLieuArr = nguyenLieu.map(item => item.ten.toLowerCase());
+        const result = await BaiDang.aggregate([
+            {
+                $addFields: {
+                    nguyenLieuLower: {
+                        $map: {
+                            input: "$nguyenLieu",
+                            as: "nl",
+                            in: { $toLower: "$$nl.ten"}
+                        }
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    matchedCount: {
+                        $size: {
+                            $setIntersection: ["$nguyenLieuLower", tenNguyenLieuArr]
+                        }
+                    }
+                }
+            },
+            {
+                $match: {
+                    matchedCount: { $gt: 0}
+                }
+            },
+            {
+                $sort: {
+                    matchedCount: -1, luotThich: -1
+                }
+            },
+            {
+                $project: {
+                    tenMon: 1,
+                    nguyenLieu: 1,
+                    cachLam: 1,
+                    nguyenLieuDinhLuong: 1,
+                    luotThich: 1,
+                    linkYtb: 1,
+                    image: 1
+                }
+            }
+        ]);
+        res.status(200).json(result);
     } catch (error) {
         res.status(500).json({message: error.message});
     }

@@ -63,15 +63,18 @@ export const patchNguoiDung = async (req, res) => {
     try {
         const { username } = req.body;
         const existed = await NguoiDung.findOne({username});
-        if (existed) {
+        const curuser = await NguoiDung.findById(req.body._id);
+        if(existed._id.equals(curuser._id)) {
+            const nguoidung = await NguoiDung.findByIdAndUpdate(req.body._id, req.body, {new: true});
+            if (!nguoidung) {
+                return res.status(404).json({message: "Không tìm thấy người dùng"});
+            }
+            const updatednguoidung = await NguoiDung.findById(req.body._id);
+            res.status(200).json({data: updatednguoidung, status: "success" ,message: "Cập nhật thông tin người dùng thành công"});
+        }
+        else if (existed && !existed._id.equals(curuser._id)) {
             return res.status(400).json({message: "Username đã tồn tại"})
         }
-        const nguoidung = await NguoiDung.findByIdAndUpdate(req.body.id, req.body, {new: true});
-        if (!nguoidung) {
-            return res.status(404).json({message: "Không tìm thấy người dùng"});
-        }
-        const updatednguoidung = await nguoidung.findById(id);
-        res.status(200).json({data: updatednguoidung, status: "success" ,message: "Cập nhật thông tin người dùng thành công"});
     } catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -141,12 +144,12 @@ export const createPost = async (req, res) => {
     try {
         const { id } = req.params;
         const baidang = await BaiDang.create(req.body);
-        const nguoidung = await NguoiDung.findByIdAndUpdate(
+        await NguoiDung.findByIdAndUpdate(
             id,
             { $addToSet: { post: baidang._id }},
             { new: true}
         ).populate("post");
-        res.status(200).json({nguoidung, baidang});
+        res.status(200).json({status: "success", message: "Tạo bài đăng thành công", data: baidang});
     } catch (error) {
         res.status(500).json({message: error.message});
     }

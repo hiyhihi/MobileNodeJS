@@ -12,8 +12,14 @@ export const getAllBaiDangs = async (req, res) => {
 
 export const createBaiDang = async (req, res) => {
     try {
+        const { nguoidungId } = req.params;
         const baidang = await BaiDang.create(req.body);
-        res.status(200).json(baidang);
+        const nguoidung = await NguoiDung.findByIdAndUpdate(
+            nguoidungId,
+            { $addToSet: { post: baidang._id }},
+            { new: true}
+        );
+        res.status(200).json({nguoidung, baidang});
     } catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -84,26 +90,8 @@ export const searchBaiDangbyIngre = async (req, res) => {
         const baidang = await BaiDang.find({
             "nguyenLieu.ten": { $in: tenNguyenLieuArr} 
         })
-        // console.log(baidang);
         res.status(200).json(baidang);
     } catch (error) {
         res.status(500).json({message: error.message});
-    }
-};
-
-export const addLuotthich = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const baidang = await BaiDang.findByIdAndUpdate(
-            id, 
-            { $inc: { luotThich: 1}},
-            { new: true}
-        )
-        if (!baidang) {
-            return res.status(404).json({message: "Không tìm thấy bài đăng"});
-        }
-        res.status(200).json(baidang);
-    } catch (error) {
-        res.status(500).json({ message: error.message});
     }
 };

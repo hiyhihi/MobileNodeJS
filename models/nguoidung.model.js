@@ -20,7 +20,8 @@ const nguoidungSchema = mongoose.Schema(
         },
         username: {
             type: String,
-            require: [true, "Hãy điền username"]
+            require: [true, "Hãy điền username"],
+            unique: true
         },
         password: {
             type: String,
@@ -30,7 +31,16 @@ const nguoidungSchema = mongoose.Schema(
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "BaiDang",
-                required: false
+                required: false,
+                default: []
+            }
+        ],
+        post: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "BaiDang",
+                required: false,
+                default: []
             }
         ]  
     }

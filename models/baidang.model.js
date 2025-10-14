@@ -27,7 +27,8 @@ const baidangSchema = mongoose.Schema({
     },
     luotThich: {
         type: Number,
-        required: false
+        required: false,
+        default: 0,
     },
     image: {
         type: String,

@@ -76,7 +76,6 @@ export const deleteBaiDang = async (req, res) => {
         if (!baidang){
             return res.status(404).json({message: "Khong tim thay bai dang"});
         }
-
         res.status(200).json({message: "Xoa bai dang thanh cong"});
     } catch (error) {
         res.status(500).json({message: error.message});

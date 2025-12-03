@@ -1,5 +1,7 @@
 import NguoiDung from '../models/nguoidung.model.js';
 import BaiDang from '../models/baidang.model.js';
+import jwt from "jsonwebtoken";
+import { getTransporter } from "../services/nodemailer.js";
 
 export const getAllNguoiDungs = async (req, res) => {
     try {
@@ -43,19 +45,90 @@ export const createNguoiDung = async (req, res) => {
 };
 
 export const checklogin = async (req, res) => {
-    const username = req.body.username;
-    const password = req.body.password;
+    const {username, password} = req.body;
 
     try {
         const nguoidung = await NguoiDung.findOne({
-            username: username,
-            password: password,
-        }).lean();
-        if (!nguoidung) res.status(401).json("Không tìm thấy người dùng");
-        else res.status(200).json(nguoidung);
+            username: username}).lean();
+        if (!nguoidung) return res.status(401).json({message: "Sai tên đăng nhập"});
+        if (nguoidung.password !== password) return res.status(401).json({message: "Sai mật khẩu"});
+
+        const token = jwt.sign({ 
+            id: nguoidung._id, username: nguoidung.username }, 
+            process.env.JWT_KEY, 
+            { expiresIn: process.env.JWT_EXPIRE });
+        delete nguoidung.password;
+        res.status(200).json({message: "Đăng nhập thành công", token, user: nguoidung });    
+            
     } catch (error) {
         console.error("Lỗi fetch data :", error);
         res.status(500).json("Không fetch được dữ liệu");
+    }
+};
+
+export const forgotPassword = async(req, res) => {
+    const {email} = req.body;
+
+    try {
+        const nguoidung = await NguoiDung.findOne({email});
+        if (!nguoidung) return res.status(404).json({message: "Email không hợp lệ"});
+        console.log(email);
+
+        const otp = Math.floor(10000 + Math.random() * 90000).toString();
+        const expireTime = Date.now() + 5 * 60 * 1000;
+
+        nguoidung.otp = otp;
+        nguoidung.otpExpire = expireTime;
+        await nguoidung.save();
+
+        console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS);
+
+        const transporter = getTransporter();
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: "Mã OTP đặt lại mật khẩu",
+            html: `<h3>Mã OTP của bạn là: <b>${otp}</b></h3>
+            <p>Có hiệu lực trong 5 phút.</p>`
+        });
+        
+        return res.status(200).json({message: "Đã gửi mã OTP đến email"})
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+export const checkOTP = async (req, res) => {
+    const {email, otp} = req.body;
+    
+    try {
+        const nguoidung = await NguoiDung.findOne({email});
+        if (!nguoidung) return res.status(401).json({message: "Email không hợp lệ"}); 
+        if (otp !== nguoidung.otp) return res.status(400).json({message: "Mã OTP sai"});
+        if (nguoidung.otpExpire < Date.now()) return res.status(400).json({message: "Mã OTP hết hạn"}); 
+        
+        return res.status(200).json({message: "Xác nhận OTP thành công"}); 
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+export const resetPassword = async(req, res) => {
+    const {email, nPassword} = req.body;
+
+    try {
+        const nguoidung = await NguoiDung.findOne({email});
+        if (!nguoidung) return res.status(401).json({message: "Không tìm thấy email"});
+
+        nguoidung.password = nPassword;
+        nguoidung.otp = undefined;
+        nguoidung.otpExpire = undefined;
+
+        await nguoidung.save();
+
+        res.status(200).json({ message: "Đổi mật khẩu thành công" });
+    } catch (error) {
+        res.status(500).json({message: error.message});
     }
 };
 

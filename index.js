@@ -1,13 +1,14 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import mongoose from 'mongoose';
-import dotenv from 'dotenv'
 import baidang from './routes/baidang.route.js';
 import nguoidung from './routes/nguoidung.route.js';
 import image from "./routes/image.routes.js";
 // import "./jobs/cacheCleaner.js";
 
-const app = express()
-dotenv.config()
+const app = express();
 
 app.use(express.json({ limit: "10mb"}));
 

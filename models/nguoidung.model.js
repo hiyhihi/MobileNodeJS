@@ -4,28 +4,28 @@ const nguoidungSchema = mongoose.Schema(
     {
         name: {
             type: String,
-            require: [true, "Hãy điền tên người dùng"]
+            required: [true, "Hãy điền tên người dùng"]
         },
         phone: {
             type: String,
-            require: [false]
+            required: [false]
         },
         email: {
             type: String,
-            require: [false]
+            required: [false]
         },
         address: {
             type: String,
-            require: [false]
+            required: [false]
         },
         username: {
             type: String,
-            require: [true, "Hãy điền username"],
+            required: [true, "Hãy điền username"],
             unique: true
         },
         password: {
             type: String,
-            require: [true, "Hãy điền password"]
+            required: [true, "Hãy điền password"]
         },
         fav: [
             {
@@ -42,7 +42,15 @@ const nguoidungSchema = mongoose.Schema(
                 required: false,
                 default: []
             }
-        ]  
+        ],
+        otp: {
+            type: String,
+            default: null
+        },
+        otpExpire: {
+            type: Date,
+            default: null
+        }  
     }
 );
 

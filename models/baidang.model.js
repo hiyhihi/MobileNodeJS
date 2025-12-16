@@ -33,6 +33,21 @@ const baidangSchema = mongoose.Schema({
     image: {
         type: String,
         required: false
+    },
+    tags: [
+        String
+    ],
+    views: {
+        type: Number,
+        default: 0
+    },
+    doKho: {
+        type: String, 
+        enum: ["De", "Trung Binh", "Kho"],
+        default: "De"        
+    },
+    createdAt: { 
+        type: Date, default: Date.now 
     }
 });
 

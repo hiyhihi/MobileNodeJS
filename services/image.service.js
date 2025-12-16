@@ -19,12 +19,24 @@ export const analyzeImageService = async (filePath) => {
                 inline_data: { mime_type: mime, data: base64 }
             },
             {
-                text: `Bạn là AI nhận diện nguyên liệu nấu ăn bằng ảnh. Trả về raw JSON, ít hơn 6 nguyên liệu, chỉ lấy tên nguyên liệu, không cần mô tả, không markdown đúng như mẫu dưới đây:
-                {
-                "nguyenLieu": [
-                    { "ten": "ingredient_name" }
-                ]
-                }`
+                text:  `Bạn là AI nhận diện nguyên liệu nấu ăn từ hình ảnh.
+                        Yêu cầu:
+                        - Nếu hình ảnh là đồ ăn hoặc món ăn:
+                        - Nhận diện các nguyên liệu có thể thấy rõ.
+                        - Trả về raw JSON đúng cấu trúc bên dưới.
+                        - Tối đa 5 nguyên liệu.
+                        - Chỉ trả về tên nguyên liệu, không mô tả, không giải thích, không markdown.
+                        - Nếu hình ảnh KHÔNG phải đồ ăn, KHÔNG phải món ăn, hoặc không thể nhận diện được nguyên liệu:
+                        - Trả về JSON rỗng: {}
+
+                        Định dạng JSON bắt buộc khi có nguyên liệu:
+                        {
+                            "nguyenLieu": [
+                                { "ten": "ingredient_name" }
+                            ]
+                        }
+
+                        Không trả về bất kỳ nội dung nào ngoài JSON.`
             }
             ]
         }
@@ -37,6 +49,7 @@ export const analyzeImageService = async (filePath) => {
         body: JSON.stringify(body)
     });
 
+    console.log("RAW AI RESPONSE:", resp);
     const result = await resp.json();
     const rawText = result?.candidates?.[0]?.content?.parts?.[0]?.text || "";
     const cleaned = rawText.replace(/```json|```/g, "").trim();

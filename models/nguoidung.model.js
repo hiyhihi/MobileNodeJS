@@ -8,15 +8,15 @@ const nguoidungSchema = mongoose.Schema(
         },
         phone: {
             type: String,
-            required: [false]
+            required: false
         },
         email: {
             type: String,
-            required: [false]
+            required: false
         },
         address: {
             type: String,
-            required: [false]
+            required: false
         },
         username: {
             type: String,
@@ -27,22 +27,14 @@ const nguoidungSchema = mongoose.Schema(
             type: String,
             required: [true, "Hãy điền password"]
         },
-        fav: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "BaiDang",
-                required: false,
-                default: []
-            }
-        ],
-        post: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "BaiDang",
-                required: false,
-                default: []
-            }
-        ],
+        fav: {
+            type: [{ type: mongoose.Schema.Types.ObjectId, ref: "BaiDang" }],
+            default: []
+        },
+        post: {
+            type: [{ type: mongoose.Schema.Types.ObjectId, ref: "BaiDang" }],
+            default: []
+        },
         otp: {
             type: String,
             default: null
@@ -50,7 +42,44 @@ const nguoidungSchema = mongoose.Schema(
         otpExpire: {
             type: Date,
             default: null
-        }  
+        },  
+        viewedPosts: [
+            {
+                post: {type: mongoose.Schema.Types.ObjectId, ref: "BaiDang"},
+                viewedAt: { type: Date, default: Date.now()}
+            }
+        ],
+        searchHistory: [
+            {
+                keyword: String,
+                createdAt: {type: Date, default: Date.now()}
+            }
+        ],
+        ingredientHistory: [
+            {
+                ingredient: String,
+                createdAt: { type: Date, default: Date.now }
+            }
+        ],
+        ignoredPost: [
+            {
+                post: {type: mongoose.Schema.Types.ObjectId, ref: "BaiDang"},
+                viewedAt: { type: Date, default: Date.now()}
+            }
+        ],
+        reels: {
+            type: [
+                {
+                    reel: { type: mongoose.Schema.Types.ObjectId, ref: "Reels" },
+                    createdAt: { type: Date, default: Date.now() }
+                }
+            ],
+            default: []
+        },
+        likedReels: {
+            type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Reels" }],
+            default: []
+        }
     }
 );
 

@@ -58,7 +58,7 @@ export const checklogin = async (req, res) => {
             process.env.JWT_KEY, 
             { expiresIn: process.env.JWT_EXPIRE });
         delete nguoidung.password;
-        res.status(200).json({message: "Đăng nhập thành công", token, user: nguoidung });    
+        res.status(200).json(nguoidung);    
             
     } catch (error) {
         console.error("Lỗi fetch data :", error);
@@ -156,52 +156,71 @@ export const patchNguoiDung = async (req, res) => {
 export const addFavorite = async (req, res) => {
     try {
         const { nguoidungId, baidangId } = req.body;
-        const nguoidung = await NguoiDung.findByIdAndUpdate(
-            nguoidungId,
-            { $addToSet: {fav: baidangId}},
-            { new: true}
-        );
-        if (!nguoidung) {
-            return res.status(404).json({message: "Không tìm thấy người dùng"});
+        // const nguoidung = await NguoiDung.findByIdAndUpdate(
+        //     nguoidungId,
+        //     { $addToSet: {fav: baidangId}},
+        //     { new: true}
+        // );
+        // if (!nguoidung) {
+        //     return res.status(404).json({message: "Không tìm thấy người dùng"});
+        // }
+        // const baidang = await BaiDang.findByIdAndUpdate(
+        //     baidangId,
+        //     { $inc: {luotThich: 1}},
+        //     { new: true}
+        // );
+        // if (!baidang) {
+        //     return res.status(404).json({message: "Không tìm thấy bài đăng"});
+        // }
+
+        const nguoidung = await NguoiDung.findById(nguoidungId);
+        const baidang = await BaiDang.findById(baidangId);
+
+        const isLiked = nguoidung.fav.some(id => String(id) === String(baidangId));
+
+        if (isLiked) {
+            nguoidung.fav = nguoidung.fav.filter(id => String(id) !== String(baidangId));
+            baidang.luotThich = Math.max(baidang.luotThich - 1, 0);
         }
-        const baidang = await BaiDang.findByIdAndUpdate(
-            baidangId,
-            { $inc: {luotThich: 1}},
-            { new: true}
-        );
-        if (!baidang) {
-            return res.status(404).json({message: "Không tìm thấy bài đăng"});
+        else {
+            nguoidung.fav.push(baidangId);
+            baidang.luotThich += 1;
         }
-        res.status(200).json({ nguoidung, baidang });
+
+        await nguoidung.save();
+        await baidang.save();
+
+
+        res.status(200).json({ liked: !isLiked, totalLikes: baidang.luotThich, nguoidung});
     } catch (error) {
         res.status(500).json({message: error.message});
     }
 };
 
-export const deleteFavorite = async(req, res) => {
-    try {
-        const { nguoidungId, baidangId } = req.body;
-        const nguoidung = await NguoiDung.findByIdAndUpdate(
-            nguoidungId,
-            { $pull: {fav: baidangId}},
-            { new: true}
-        );
-        if (!nguoidung) {
-            return res.status(404).json({ message: "Không tìm thấy người dùng" });
-        }
-        const baidang = await BaiDang.findByIdAndUpdate(
-            baidangId,
-            { $inc: { luotThich: -1}},
-            { new: true}
-        );
-        if (!baidang) {
-            return res.status(404).json({message: "Không tìm thấy bài đăng"});
-        }
-        res.status(200).json({ nguoidung, baidang });
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
+// export const deleteFavorite = async(req, res) => {
+//     try {
+//         const { nguoidungId, baidangId } = req.body;
+//         const nguoidung = await NguoiDung.findByIdAndUpdate(
+//             nguoidungId,
+//             { $pull: {fav: baidangId}},
+//             { new: true}
+//         );
+//         if (!nguoidung) {
+//             return res.status(404).json({ message: "Không tìm thấy người dùng" });
+//         }
+//         const baidang = await BaiDang.findByIdAndUpdate(
+//             baidangId,
+//             { $inc: { luotThich: -1}},
+//             { new: true}
+//         );
+//         if (!baidang) {
+//             return res.status(404).json({message: "Không tìm thấy bài đăng"});
+//         }
+//         res.status(200).json({ nguoidung, baidang });
+//     } catch (error) {
+//         res.status(500).json({message: error.message});
+//     }
+// };
 
 export const getFavorite = async(req, res) => {
     try {
@@ -238,7 +257,7 @@ export const deletePost = async (req, res) => {
             { $pull: { post: baidangId }},
             { new: true}
         );
-        res.status(200).json({message: "Xoa bai dang thanh cong"});
+        res.status(200).json({message: "Xóa bài đăng thành công"});
     } catch (error) {
         res.status(500).json({message: error.message});
     }

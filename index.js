@@ -6,7 +6,9 @@ import mongoose from 'mongoose';
 import baidang from './routes/baidang.route.js';
 import nguoidung from './routes/nguoidung.route.js';
 import image from "./routes/image.routes.js";
-// import "./jobs/cacheCleaner.js";
+import recommendRoute from "./routes/recommend.route.js";
+import reel from './routes/reel.route.js';
+import comment from './routes/comment.route.js';
 
 const app = express();
 
@@ -17,10 +19,12 @@ app.get('/', (req, res) => {
 });
 
 app.use('/images', express.static('images'));
-
 app.use('/api/baidang', baidang);
 app.use('/api/nguoidung', nguoidung);
 app.use("/api/image", image);
+app.use("/api/recommend", recommendRoute);
+app.use("/api/reel", reel);
+app.use("/api/comment", comment);
 
 console.log("URI:", process.env.MONGODB_URI || process.env.MONGO_URI);
 mongoose.connect(process.env.MONGODB_URI)

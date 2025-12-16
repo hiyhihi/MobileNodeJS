@@ -134,3 +134,35 @@ export const searchBaiDangbyIngre = async (req, res) => {
         res.status(500).json({message: error.message});
     }
 };
+
+export const getSelfPost = async (req, res) => {
+    try {
+        const { nguoidungId } = req.params;
+        const nguoidung = await NguoiDung.findById(nguoidungId).populate({
+            path: 'post',
+            model: 'BaiDang',
+            select: 'tenMon nguyenLieu image luotThich createdAt'
+        });
+
+        if (!nguoidung) {
+            return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
+        }
+
+        const posts = nguoidung.post || [];
+        const postNums = nguoidung.post.length;
+        const tongLike = posts.reduce((sum, p) => sum + (p.luotThich || 0), 0);
+        
+        res.status(200).json({ posts, postNums,tongLike });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const getAllVideo = async (req, res) => {
+    try {
+        const link = await BaiDang.find({}).select('linkYtb');
+        res.status(200).json(link);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};

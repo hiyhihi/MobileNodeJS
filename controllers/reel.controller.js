@@ -52,7 +52,7 @@ export const uploadReels = [upload.single("video"), async (req, res) => {
             $push: { reels: newReel._id }
         });
 
-        res.status(201).json({newReel});
+        res.status(201).json(newReel);
     } catch (error) {
         console.error("Upload reel error:", error);
         res.status(500).json({message: "Failed to upload reel", error: error.message});
@@ -66,7 +66,7 @@ export const getAllReels = async (req, res) => {
         .populate("nguoidung", "nguoidung name")
         .sort({ createdAt: -1 });
 
-        res.status(200).json({reels});
+        res.status(200).json(reels);
     } catch (error) {
         console.error("Get all reels error:", error);
         res.status(500).json({message: error.message});

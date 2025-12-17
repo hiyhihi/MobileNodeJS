@@ -1,5 +1,5 @@
 import express from "express";
-import { getAllNguoiDungs, getNguoiDungById, createNguoiDung, checklogin, patchNguoiDung, addFavorite, getFavorite, createPost, deletePost, forgotPassword, checkOTP, resetPassword} from "../controllers/nguoidung.controller.js";
+import { getAllNguoiDungs, getNguoiDungById, createNguoiDung, checklogin, patchNguoiDung, addFavorite, getFavorite, createPost, deletePost, forgotPassword, checkOTP, resetPassword, uploadAva} from "../controllers/nguoidung.controller.js";
 
 const router = express.Router();
 
@@ -13,8 +13,9 @@ router.patch('/patch', patchNguoiDung);
 router.patch('/patch/addFav', addFavorite);
 // router.patch('/patch/deleteFav', deleteFavorite);
 router.get('/fav/:id', getFavorite);
-router.post("/add/:id",createPost);
+router.post("/add/:id", createPost);
 router.patch("/delete/:id", deletePost);
 router.get('/:id', getNguoiDungById);
+router.put("/avatar/:nguoidungId", uploadAva);
 
 export default router;

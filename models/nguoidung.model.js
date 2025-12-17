@@ -79,6 +79,10 @@ const nguoidungSchema = mongoose.Schema(
         likedReels: {
             type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Reels" }],
             default: []
+        },
+        avatar: {
+            type: String,
+            required: false
         }
     }
 );

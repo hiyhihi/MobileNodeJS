@@ -141,7 +141,7 @@ export const getSelfPost = async (req, res) => {
         const nguoidung = await NguoiDung.findById(nguoidungId).populate({
             path: 'post',
             model: 'BaiDang',
-            select: 'tenMon nguyenLieu image luotThich createdAt'
+            select: 'tenMon nguyenLieu image luotThich createdAt cachLam linkYtb views tags'
         });
 
         if (!nguoidung) {
@@ -152,7 +152,7 @@ export const getSelfPost = async (req, res) => {
         const postNums = nguoidung.post.length;
         const tongLike = posts.reduce((sum, p) => sum + (p.luotThich || 0), 0);
         
-        res.status(200).json({ posts, postNums,tongLike });
+        res.status(200).json({ posts, postNums, tongLike });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -162,6 +162,16 @@ export const getAllVideo = async (req, res) => {
     try {
         const link = await BaiDang.find({}).select('linkYtb');
         res.status(200).json(link);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+export const getRecentViewed = async(req, res) => {
+    try {
+        const { nguoidungId } = req.params;
+        const baidang = await NguoiDung.findById(nguoidungId).populate("viewedPosts.post");
+        res.status(200).json(baidang.viewedPosts);
     } catch (error) {
         res.status(500).json({message: error.message});
     }

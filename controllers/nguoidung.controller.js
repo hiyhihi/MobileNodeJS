@@ -2,6 +2,34 @@ import NguoiDung from '../models/nguoidung.model.js';
 import BaiDang from '../models/baidang.model.js';
 import jwt from "jsonwebtoken";
 import { getTransporter } from "../services/nodemailer.js";
+import cloudinary from "../config/cloudinary.js";
+import fs from "fs";
+import multer from 'multer';
+import path from 'path';
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "avatar/");
+    },
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        cb(null, Date.now() + ext);
+    }
+});
+
+const upload = multer({
+    storage,
+    limits: {
+        fileSize: 50 * 1024 * 1024 
+    },
+    fileFilter: (req, file, cb) => {
+        if (!file.mimetype.startsWith("image/")) {
+            cb(new Error("Chỉ ảnh được cho phép đăng"));
+        } else {
+            cb(null, true);
+        }
+    }
+});
 
 export const getAllNguoiDungs = async (req, res) => {
     try {
@@ -260,3 +288,36 @@ export const deletePost = async (req, res) => {
         res.status(500).json({message: error.message});
     }
 };
+
+export const uploadAva = [upload.single("image"), async(req, res) => {
+    try {
+        const { nguoidungId } = req.params;
+        if(!req.file){
+            return res.status(400).json({ message: "Chưa nhận được file ảnh avatar"});
+        } 
+
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            resource_type: "image",
+            folder: "avatars",
+            transformation: [
+                    { width: 300, height: 300, crop: "fill", gravity: "face" }
+            ]
+        });
+
+        fs.unlinkSync(req.file.path);
+
+        const updatedUser = await NguoiDung.findByIdAndUpdate(
+            nguoidungId,
+            { avatar: result.secure_url},
+            { new: true}
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "Không tìm thấy người dùng" });
+        }
+
+        res.status(200).json({avatar: updatedUser.avatar});
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}]

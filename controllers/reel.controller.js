@@ -22,7 +22,7 @@ const upload = multer({
     },
     fileFilter: (req, file, cb) => {
         if (!file.mimetype.startsWith("video/")) {
-            cb(new Error("Only video files are allowed"));
+            cb(new Error("Chỉ video được cho phép đăng"));
         } else {
             cb(null, true);
         }
@@ -62,10 +62,8 @@ const upload = multer({
 //     }
 // ];
 
-export const uploadReels = [
-    upload.single("video"),
-    async (req, res) => {
-        try {
+export const uploadReels = [upload.single("video"),async (req, res) => {
+    try {
         const { userId, tieude, description, tags, nguyenLieu } = req.body;
 
         if (!req.file) {
@@ -93,9 +91,9 @@ export const uploadReels = [
         });
 
         res.status(201).json(newReel);
-        } catch (error) {
+    } catch (error) {
         res.status(500).json({ message: error.message });
-        }
+    }
     }
 ];
 
@@ -148,3 +146,17 @@ export const likeReel = async (req, res) => {
         res.status(500).json({message: error.message});
     }
 };
+
+export const trackViewReels = async(req, res) => {
+    try {
+        const { reelId } = req.params;
+    
+        const reel = await Reels.findByIdAndUpdate(reelId, {
+            $inc: { views: 1 }
+        });
+    
+        res.json({ success: true , views: reel.views});
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}

@@ -73,7 +73,7 @@ export const trackView = async (req, res) => {
 export const trackIgnore = async (req, res) => {
     try {
         const { userId } = req.body;
-        const { postId } = req.params;
+        const { postId } = req.body;
 
         if (!userId || !postId) {
             return res.status(400).json({ message: "Missing data" });

@@ -3,6 +3,6 @@ import { addComment } from "../controllers/comment.controller.js";
 
 const router = express.Router();
 
-router.post("/reels/upload", addComment);
+router.post("/comment", addComment);
 
 export default router;

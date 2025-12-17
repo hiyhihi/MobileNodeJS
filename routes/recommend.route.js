@@ -1,9 +1,10 @@
 import express from "express";
-import { recommendPosts, trackView } from "../controllers/recommend.controller.js";
+import { recommendPosts, trackView, trackIgnore} from "../controllers/recommend.controller.js";
 
 const router = express.Router();
 
 router.get("/:userId", recommendPosts);
-router.post("/view/:postId", trackView);
+router.post("/trackView", trackView);
+router.post("/trackIgnore", trackIgnore);
 
 export default router;

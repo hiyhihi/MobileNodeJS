@@ -2,6 +2,8 @@ import NguoiDung from '../models/nguoidung.model.js';
 import Reels from '../models/reels.model.js';
 import multer from 'multer';
 import path from 'path';
+import cloudinary from "../config/cloudinary.js";
+import fs from "fs";
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -27,23 +29,61 @@ const upload = multer({
     }
 });
 
-export const uploadReels = [upload.single("video"), async (req, res) => {
-    try {
+// export const uploadReels = [upload.single("video"), async (req, res) => {
+//     try {
+//         const { userId, tieude, description, tags, nguyenLieu } = req.body;
+
+//         if (!req.file) {
+//             return res
+//             .status(400)
+//             .json({ message: "Video file is required" });
+//         }
+
+//         const videoUrl = `/video/${req.file.filename}`;
+
+//         const newReel = await Reels.create({
+//             user: userId,
+//             tieude,
+//             description,
+//             videoUrl,
+//             tags: tags ? tags.split(",") : [],
+//             nguyenLieu: nguyenLieu ? nguyenLieu.split(",") : []
+//         });
+
+//         await NguoiDung.findByIdAndUpdate(userId, {
+//             $push: { reels: newReel._id }
+//         });
+
+//         res.status(201).json(newReel);
+//     } catch (error) {
+//         console.error("Upload reel error:", error);
+//         res.status(500).json({message: "Failed to upload reel", error: error.message});
+//     }
+//     }
+// ];
+
+export const uploadReels = [
+    upload.single("video"),
+    async (req, res) => {
+        try {
         const { userId, tieude, description, tags, nguyenLieu } = req.body;
 
         if (!req.file) {
-            return res
-            .status(400)
-            .json({ message: "Video file is required" });
+            return res.status(400).json({ message: "Video file is required" });
         }
 
-        const videoUrl = `/video/${req.file.filename}`;
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            resource_type: "video",
+            folder: "reels"
+        });
+
+        fs.unlinkSync(req.file.path);
 
         const newReel = await Reels.create({
-            user: userId,
+            nguoidung: userId,
             tieude,
             description,
-            videoUrl,
+            videoUrl: result.secure_url, 
             tags: tags ? tags.split(",") : [],
             nguyenLieu: nguyenLieu ? nguyenLieu.split(",") : []
         });
@@ -53,12 +93,12 @@ export const uploadReels = [upload.single("video"), async (req, res) => {
         });
 
         res.status(201).json(newReel);
-    } catch (error) {
-        console.error("Upload reel error:", error);
-        res.status(500).json({message: "Failed to upload reel", error: error.message});
-    }
+        } catch (error) {
+        res.status(500).json({ message: error.message });
+        }
     }
 ];
+
 
 export const getAllReels = async (req, res) => {
     try {

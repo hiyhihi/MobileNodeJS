@@ -76,7 +76,7 @@ export const trackIgnore = async (req, res) => {
         const { postId } = req.params;
 
         if (!userId || !postId) {
-        return res.status(400).json({ message: "Missing data" });
+            return res.status(400).json({ message: "Missing data" });
         }
 
         await NguoiDung.findByIdAndUpdate(

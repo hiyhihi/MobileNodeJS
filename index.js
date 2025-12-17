@@ -1,6 +1,10 @@
-import dotenv from 'dotenv';
-dotenv.config();
+// import dotenv from 'dotenv';
+import 'dotenv/config';
+// dotenv.config();
+console.log("CLOUDINARY_API_KEY =", process.env.CLOUDINARY_API_KEY);
+console.log("CLOUDINARY_API_KEY =", process.env.CLOUDINARY_API_SECRET);
 
+import path from 'path';
 import express from 'express';
 import mongoose from 'mongoose';
 import baidang from './routes/baidang.route.js';
@@ -13,6 +17,7 @@ import comment from './routes/comment.route.js';
 const app = express();
 
 app.use(express.json({ limit: "10mb"}));
+app.use("/video", express.static(path.resolve("video")));
 
 app.get('/', (req, res) => {
     res.send('Hello from cookbyingredient hehe')

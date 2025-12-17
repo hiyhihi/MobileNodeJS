@@ -186,10 +186,8 @@ export const addFavorite = async (req, res) => {
             nguoidung.fav.push(baidangId);
             baidang.luotThich += 1;
         }
-
         await nguoidung.save();
         await baidang.save();
-
 
         res.status(200).json({ liked: !isLiked, totalLikes: baidang.luotThich, nguoidung});
     } catch (error) {

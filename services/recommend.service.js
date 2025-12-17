@@ -15,20 +15,6 @@ export const calculateScore = (post, user, preferredDifficulty) => {
     );
     if (viewed) score += 4;
 
-    user.searchHistory?.forEach(s => {
-        if (
-            post.tenMon
-                .toLowerCase()
-                .includes(s.keyword.toLowerCase())) 
-                {score += 3;}
-    });
-
-    post.nguyenLieu.forEach(nl => {
-        if (user.ingredientHistory?.includes(nl.ten)) {
-            score += 4;
-        }
-    });
-
     if (viewed) {
         score *= calcRecencyFactor(viewed.viewedAt);
     }

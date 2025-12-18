@@ -103,19 +103,15 @@ export const trackViewReels = async(req, res) => {
 export const getSelfReels = async (req, res) => {
     try {
         const { nguoidungId } = req.params;
-
-        const nguoidung = await NguoiDung.findById(nguoidungId).populate({
-            path: 'reels.reel',
-            model: 'Reels',
-        });
-
+        const nguoidung = await NguoiDung.findById(nguoidungId).select("_id");
         if (!nguoidung) {
-            return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
+            return res.status(404).json({ message: "Không tìm thấy người dùng." });
         }
 
-        const reels = nguoidung.reels || [];
-        const reelsNums = nguoidung.reels.length;
-        const tongLike = reels.reduce((sum, r) => sum + (r.likes || 0), 0);
+        const reels = await Reels.find({ nguoidung: nguoidungId }).select("videoUrl description tags nguyenLieu likes views createdAt").sort({ createdAt: -1 });
+        const reelsNums = reels.length;
+
+        const tongLike = reels.reduce((sum, r) => sum + (r.likes || 0),0);
 
         res.status(200).json({ reels, reelsNums, tongLike});
     } catch (error) {

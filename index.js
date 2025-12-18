@@ -1,8 +1,4 @@
-// import dotenv from 'dotenv';
 import 'dotenv/config';
-// dotenv.config();
-console.log("CLOUDINARY_API_KEY =", process.env.CLOUDINARY_API_KEY);
-console.log("CLOUDINARY_API_KEY =", process.env.CLOUDINARY_API_SECRET);
 
 import path from 'path';
 import express from 'express';
@@ -31,7 +27,6 @@ app.use("/api/recommend", recommendRoute);
 app.use("/api/reel", reel);
 app.use("/api/comment", comment);
 
-console.log("URI:", process.env.MONGODB_URI || process.env.MONGO_URI);
 mongoose.connect(process.env.MONGODB_URI)
 .then(() => {
     console.log("Connected to database!")

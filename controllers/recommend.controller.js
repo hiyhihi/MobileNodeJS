@@ -38,7 +38,7 @@ export const recommendPosts = async (req, res) => {
             .slice(0, 10)
             .map(i => i.post);
 
-        res.status(200).json({ success: true, data: result });
+        res.status(200).json(result);
     } catch (error) {
         res.status(500).json({message: error.message});
     }

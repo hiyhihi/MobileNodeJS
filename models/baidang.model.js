@@ -14,8 +14,7 @@ const baidangSchema = mongoose.Schema({
     }
     ],
     nguyenLieuDinhLuong: {
-        type: String,
-        required: [true, "Hãy nhập định lượng nguyên liệu"]
+        type: String
     },
     cachLam: {
         type: String,
@@ -44,7 +43,7 @@ const baidangSchema = mongoose.Schema({
     doKho: {
         type: String, 
         enum: ["De", "Trung Binh", "Kho"],
-        default: "De"        
+        default: "Trung Binh"        
     },
     createdAt: { 
         type: Date, default: Date.now 

@@ -8,7 +8,6 @@ const reelSchema = mongoose.Schema({
     },
     tieude: {
         type: String,
-        required: true
     },
     videoUrl: {
         type: String,

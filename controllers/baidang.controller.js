@@ -170,8 +170,14 @@ export const getAllVideo = async (req, res) => {
 export const getRecentViewed = async(req, res) => {
     try {
         const { nguoidungId } = req.params;
-        const baidang = await NguoiDung.findById(nguoidungId).populate("viewedPosts.post");
-        res.status(200).json(baidang.viewedPosts);
+        const nguoidung = await NguoiDung.findById(nguoidungId).populate("viewedPosts.post");
+
+        nguoidung.viewedPosts.sort(
+            (a, b) => new Date(b.viewedAt) - new Date(a.viewedAt)
+        );
+
+        const baidang = nguoidung.viewedPosts;
+        res.status(200).json(baidang);
     } catch (error) {
         res.status(500).json({message: error.message});
     }

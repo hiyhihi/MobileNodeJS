@@ -17,6 +17,6 @@ router.get('/fav/:id', getFavorite);
 router.post("/add/:id", moderatePostContent, createPost);
 router.patch("/delete/:id", deletePost);
 router.get('/:id', getNguoiDungById);
-router.put("/avatar/:nguoidungId", uploadAva);
+router.post("/avatar/:nguoidungId", uploadAva);
 
 export default router;

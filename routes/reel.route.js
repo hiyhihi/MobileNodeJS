@@ -1,5 +1,5 @@
 import express from "express";
-import { uploadReels, getAllReels, likeReel, trackViewReels } from "../controllers/reel.controller.js";
+import { uploadReels, getAllReels, likeReel, trackViewReels, getSelfReels } from "../controllers/reel.controller.js";
 import { moderatePostContent } from "../middlewares/moderation.middleware.js";
 import { uploadVideo } from "../middlewares/uploadVideo.middleware.js";
 
@@ -9,5 +9,6 @@ router.post("/upload", uploadVideo.single("video"), moderatePostContent, uploadR
 router.get("/", getAllReels);
 router.post("/:reelId/like", likeReel);
 router.put("/trackViewReels/:reelId", trackViewReels);
+router.get("/getSelfReels/:nguoidungId", getSelfReels);
 
 export default router;

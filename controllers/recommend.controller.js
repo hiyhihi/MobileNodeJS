@@ -18,31 +18,44 @@ export const recommendPosts = async (req, res) => {
                 message: "User not found"
             });
         }
-
         const posts = await BaiDang.find();
+
+        if (!user.viewedPosts || user.viewedPosts.length === 0) {
+            return res.status(200).json(posts);
+        }
 
         const preferredDifficulty = getPreferredDifficulty(user.viewedPosts);
 
         const scoredPosts = posts.map(post => ({
             post,
-            score: calculateScore(
-                post,
-                user,
-                preferredDifficulty
-            )
+            score: calculateScore(post, user, preferredDifficulty)
         }));
 
-        const result = scoredPosts
+        const recommendedPosts = scoredPosts
             .filter(i => i.score > 0)
             .sort((a, b) => b.score - a.score)
             .slice(0, 10)
             .map(i => i.post);
 
-        res.status(200).json(result);
+        const recommendedIds = new Set(
+            recommendedPosts.map(p => p._id.toString())
+        );
+
+        const remainingPosts = posts.filter(
+            post => !recommendedIds.has(post._id.toString())
+        );
+
+        const finalResult = [
+            ...recommendedPosts,
+            ...remainingPosts
+        ];
+
+        res.status(200).json(finalResult);
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({ message: error.message });
     }
 };
+
 
 export const trackView = async (req, res) => {
     try {
